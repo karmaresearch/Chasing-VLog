@@ -1,0 +1,22 @@
+# !/bin/sh
+# Detect if we are on mac or linux, and set SYS accordingly.
+# Also, set $TIME to a time command that prints resources used.
+
+case X$OSTYPE in
+X)
+    echo "OSTYPE is not set ..." 1>&2
+    exit 1
+    ;;
+Xlinux*)
+    export SYS=linux
+    export TIME="/usr/bin/time -v"
+    ;;
+Xdarwin*)
+    export SYS=mac
+    export TIME="/usr/bin/time -l"
+    ;;
+X*)
+    echo "unrecognized OSTYPE:" $OSTYPE 1>&2
+    exit 1
+    ;;
+esac

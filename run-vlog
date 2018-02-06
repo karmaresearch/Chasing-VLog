@@ -1,0 +1,86 @@
+#! /bin/sh
+
+case X$# in
+    X2)	;;
+    *)	echo "Usage: sh $0 [ restricted | skolem ] <data-parameter>" 1>&2
+	exit 1
+	;;
+esac
+
+CHASETYPE=$1
+DATASET=params-datasets/$2
+
+if [ ! -f $DATASET ]
+then	
+    if [ ! -f $2 ]
+    then
+	echo "$DATASET not found" 1>&2
+	exit 1
+    else
+	DATASET=$2
+    fi
+fi
+
+RESTRICTED=false
+CHASE=$CHASETYPE
+case X$CHASETYPE in
+Xrestricted)
+    CHASETYPE=standard
+    RESTRICTED=true
+    ;;
+Xstandard)
+    RESTRICTED=true
+    CHASE=restricted
+    ;;
+Xskolem)
+    ;;
+X*)
+    echo "Unrecognized chase type: " $CHASETYPE 1>&2
+    exit 1
+    ;;
+esac
+
+# Sets SYS and TIME command
+. support-scripts/detectSystem
+
+# Get some info on the processor we are running on
+. support-scripts/get-sysinfo.$SYS
+
+# set some environment variables describing the dataset
+. $DATASET
+
+# VLOG_RULES is not set for the chasebench datasets. We just convert the rules to VLog format.
+case X$VLOG_RULES in
+X)
+    sh support-scripts/rule-converter $RDFOX_ST_TGDS $RDFOX_T_TGDS > tmpVlogRules
+    VLOG_RULES=tmpVlogRules
+    ;;
+esac
+
+#Generate edb.conf.
+sh support-scripts/create-conf $DATA > edb.conf
+
+OUT=vlog-$2.$CHASETYPE.out
+
+$TIME vlog/build/vlog mat \
+	-e edb.conf \
+	--restrictedChase $RESTRICTED \
+	--rules $VLOG_RULES \
+	-l info \
+	> $OUT 2>&1
+
+rm -f edb.conf tmpVlogRules
+
+# Extracts statistics from vlog and "/usr/bin/time -l"  output
+echo "Program: VLog"
+echo "Chase: $CHASE"
+echo "Dataset: $2"
+echo "Date: " `date`
+echo Processor:  $MODEL
+# Cores and Threads not relevant for vlog, since it only uses 1
+# echo Cores: $CORES
+# echo Threads: $THREADS
+echo "System: " $OSTYPE
+grep 'Runtime materialization' $OUT | sed 's/.*Runtime materialization = \(.*\) milliseconds/\1/' | awk '{printf "Time: %.0f ms\n", $1}'
+grep 'Max memory used' $OUT | sed 's/.*: \(.*\) MB/\1/' | awk '{printf "Mem: %.0f MB\n", $1}'
+grep 'Total # derivations:' $OUT | sed 's/.*derivations: */Generated tuples: /'

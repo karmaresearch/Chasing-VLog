@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#converts rules from chasebench format to vlog format, writing the result to standard output.
+#chasebench-format rule files must be provided as command line arguments.
+
+for file in "$@"
+do
+    tr -d '\015' < $file | awk '/,$/{printf $0}!/,$/' | awk '/->$/{printf $0}!/->$/' | sed 's/\(.*\)->\(.*\)\./\2 :- \1/' | sed 's/  *//g' | sed 's/?/X/g' | sed 's/:-/ :- /'
+done

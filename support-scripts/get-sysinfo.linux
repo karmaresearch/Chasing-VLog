@@ -1,0 +1,6 @@
+# /bin/sh
+# Get some processor info
+export MODEL=`lscpu | grep 'Model name:' | sed 's/.*:  *//'`
+export THREADS=`lscpu | grep '^CPU(s):' | sed 's/.*:  *//'`
+tpc=`lscpu | grep 'Thread(s) per core:' | sed 's/.*:  *//'`
+export CORES=`expr $THREADS / $tpc`

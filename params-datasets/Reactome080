@@ -1,0 +1,8 @@
+NAME=Reactome080_norm.owl
+DIR=datasets/Reactome/$NAME
+DATA=$DIR/common/data
+VLOG_RULES=$DIR/vlog/$NAME.rules
+RDFOX_T_TGDS=$DIR/rdfox/rules/$NAME.t-tgds.txt
+RDFOX_ST_TGDS=$DIR/rdfox/rules/$NAME.st-tgds.txt
+RDFOX_T_SCHEMA=$DIR/rdfox/schemas/$NAME.t-schema.txt
+RDFOX_S_SCHEMA=$DIR/rdfox/schemas/$NAME.s-schema.txt

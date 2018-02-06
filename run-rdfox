@@ -1,0 +1,92 @@
+#! /bin/sh
+
+case X$# in
+    X2) ;;
+    *)  echo "Usage: sh $0 [ restricted | skolem ] <data-parameter>" 1>&2
+        exit 1
+        ;;
+esac
+
+CHASETYPE=$1
+DATASET=params-datasets/$2
+
+if [ ! -f $DATASET ]
+then	
+    if [ ! -f $2 ]
+    then
+	echo "$DATASET not found" 1>&2
+	exit 1
+    else
+	DATASET=$2
+    fi
+fi
+
+CHASE=$CHASETYPE
+case X$CHASETYPE in
+Xrestricted)
+    CHASETYPE=standard
+    CHASE=restricted
+    ;;
+Xstandard)
+    ;;
+Xskolem)
+    ;;
+X*)
+    echo "Unrecognized chase type: " $CHASETYPE 1>&2
+    exit 1
+    ;;
+esac
+
+# Sets SYS and TIME command
+. support-scripts/detectSystem
+
+# Get some info on the processor we are running on
+. support-scripts/get-sysinfo.$SYS
+
+# set some environment variables describing the dataset
+. $DATASET
+
+OUT=rdfox-$2.$CHASETYPE.out
+
+# T_TGDS not present for all data sets. Doctors does not have it.
+T_TGDS=
+case X$RDFOX_T_TGDS in
+X)	;;
+X*)	T_TGDS="-t-tgds $RDFOX_T_TGDS"
+	;;
+esac
+$TIME java -jar chasebench/tools/rdfox/chaseRDFox-$SYS.jar \
+	-chase $CHASETYPE \
+	-s-sch $RDFOX_S_SCHEMA \
+	-t-sch $RDFOX_T_SCHEMA \
+	-src $DATA \
+	-st-tgds $RDFOX_ST_TGDS \
+	$T_TGDS \
+	-trg temp > rdfox-$2.$CHASETYPE.out 2>&1
+
+rm -rf temp
+
+. support-scripts/get-sysinfo.$SYS
+
+# Extracts statistics from rdfox and "/usr/bin/time -l"  output
+echo "Program: RDFox"
+echo "Chase: $CHASE"
+echo "Dataset: $2"
+echo Date:  `date`
+echo System: $OSTYPE
+echo Processor: $MODEL
+echo Cores: $CORES
+echo Threads: $THREADS
+grep 'Chase took.*in total' $OUT | sed 's/.*took \(.* ms\) in total.*/Time: \1/'
+MEM=`grep 'aximum resident set size' $OUT | sed 's/ *[mM]aximum resident set size//' | sed 's/ (kbytes): //'`
+
+# Linux (time -v) reports in kbytes, mac (time -l) reports in bytes.
+case $SYS in
+mac)
+    echo Mem: `expr \( $MEM + 524288 \) / 1048576` "MB"
+    ;;
+*)
+    echo Mem: `expr \( $MEM + 512 \) / 1024` "MB"
+    ;;
+esac
+grep '^Total # of tuples:' $OUT | sed 's/.*: */Generated tuples: /'

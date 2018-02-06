@@ -1,0 +1,7 @@
+NAME=doctors
+DIR=chasebench/scenarios/$NAME
+DATA=$DIR/data/10k
+# RDFOX_T_TGDS=$DIR/dependencies/$NAME.t-tgds.txt
+RDFOX_ST_TGDS=$DIR/dependencies/$NAME.st-tgds.txt
+RDFOX_T_SCHEMA=$DIR/schema/$NAME.t-schema.txt
+RDFOX_S_SCHEMA=$DIR/schema/$NAME.s-schema.txt

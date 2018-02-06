@@ -1,0 +1,13 @@
+#!/bin/bash
+# Creates an EDB configuration file for a directory containing cvs files.
+CNT=0
+PWD=`pwd`
+for i in $1/*.csv
+do
+    name=`basename $i .csv`
+    echo EDB${CNT}_predname=$name
+    echo EDB${CNT}_type=INMEMORY
+    echo EDB${CNT}_param0=$PWD/$1
+    echo EDB${CNT}_param1=$name
+    CNT=`expr $CNT + 1`
+done

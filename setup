@@ -1,0 +1,50 @@
+#! /bin/sh
+# First clone the chasebench repository, if not already present.
+
+if [ -d chasebench ]
+then	:
+else
+    git clone https://github.com/dbunibas/chasebench.git
+fi
+
+# Then, check that the datasets are unzipped, or unzip them.
+
+SCENARIOS=chasebench/scenarios
+for dir in $SCENARIOS/LUBM/data/01k $SCENARIOS/LUBM/data/100 $SCENARIOS/Ontology-256/data $SCENARIOS/STB-128/data 
+do
+    (	cd $dir
+	if [ -f data.zip.001 ]
+	then
+	    cat data.zip.* > x.zip
+	    rm -f data.zip.*
+	    unzip x.zip
+	    rm -f x.zip
+	fi
+    )
+done
+
+for dir in datasets/*/*/common/data
+do
+    ( cd $dir && gunzip *.gz 2>/dev/null )
+done
+
+# Then, clone vlog, if not present.
+
+if [ -d vlog ]
+then	:
+else
+    git clone https://github.com/karmaresearch/vlog.git
+fi
+
+# Then, build vlog if not already done.
+
+if [ -f vlog/build/vlog ]
+then	:
+else
+    cd vlog
+    mkdir -p build
+    cd build
+    cmake ..
+    make
+    cd ../..
+fi
