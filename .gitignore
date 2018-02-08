@@ -1,3 +1,4 @@
 *.out
 vlog
 chasebench
+*.csv

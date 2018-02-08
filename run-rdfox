@@ -9,6 +9,7 @@ esac
 
 CHASETYPE=$1
 DATASET=params-datasets/$2
+DATASET_NAME=$2
 
 if [ ! -f $DATASET ]
 then	
@@ -18,6 +19,7 @@ then
 	exit 1
     else
 	DATASET=$2
+	DATASET_NAME=`basename $2`
     fi
 fi
 
@@ -46,7 +48,7 @@ esac
 # set some environment variables describing the dataset
 . $DATASET
 
-OUT=rdfox-$2.$CHASETYPE.out
+OUT=rdfox-$DATASET_NAME.$CHASETYPE.out
 
 # T_TGDS not present for all data sets. Doctors does not have it.
 T_TGDS=
@@ -62,7 +64,7 @@ $TIME java -jar chasebench/tools/rdfox/chaseRDFox-$SYS.jar \
 	-src $DATA \
 	-st-tgds $RDFOX_ST_TGDS \
 	$T_TGDS \
-	-trg temp > rdfox-$2.$CHASETYPE.out 2>&1
+	-trg temp > rdfox-$DATASET_NAME.$CHASETYPE.out 2>&1
 
 rm -rf temp
 
@@ -71,7 +73,7 @@ rm -rf temp
 # Extracts statistics from rdfox and "/usr/bin/time -l"  output
 echo "Program: RDFox"
 echo "Chase: $CHASE"
-echo "Dataset: $2"
+echo "Dataset: $DATASET_NAME"
 echo Date:  `date`
 echo System: $OSTYPE
 echo Processor: $MODEL

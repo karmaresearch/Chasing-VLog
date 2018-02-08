@@ -1,10 +1,13 @@
 #! /bin/sh
 # First clone the chasebench repository, if not already present.
 
+>setup.log
+
 if [ -d chasebench ]
 then	:
 else
-    git clone https://github.com/dbunibas/chasebench.git
+    echo "Downloading chasebench ..."
+    git clone https://github.com/dbunibas/chasebench.git >> setup.log 2>&1
 fi
 
 # Then, check that the datasets are unzipped, or unzip them.
@@ -17,7 +20,8 @@ do
 	then
 	    cat data.zip.* > x.zip
 	    rm -f data.zip.*
-	    unzip x.zip
+	    echo "Unzipping data in $dir"
+	    unzip -qq x.zip
 	    rm -f x.zip
 	fi
     )
@@ -25,7 +29,10 @@ done
 
 for dir in datasets/*/*/common/data
 do
-    ( cd $dir && gunzip *.gz 2>/dev/null )
+    ( cd $dir
+      echo "Unzipping data in $dir"
+      gunzip -q -f -k *.gz 2>/dev/null
+    )
 done
 
 # Then, clone vlog, if not present.
@@ -33,7 +40,8 @@ done
 if [ -d vlog ]
 then	:
 else
-    git clone https://github.com/karmaresearch/vlog.git
+    echo "Downloading vlog ..."
+    git clone https://github.com/karmaresearch/vlog.git >> setup.log 2>&1
 fi
 
 # Then, build vlog if not already done.
@@ -41,10 +49,11 @@ fi
 if [ -f vlog/build/vlog ]
 then	:
 else
+    echo "building vlog ..."
     cd vlog
     mkdir -p build
     cd build
-    cmake ..
-    make
+    cmake .. >> ../../setup.log 2>&1
+    make >> ../../setup.log 2>&1
     cd ../..
 fi
