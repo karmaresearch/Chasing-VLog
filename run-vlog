@@ -86,11 +86,11 @@ echo "Program: VLog"
 echo "Chase: $CHASE"
 echo "Dataset: $DATASET_NAME"
 echo "Date: " `date`
+echo "System: " $OSTYPE
 echo Processor:  $MODEL
 # Cores and Threads not relevant for vlog, since it only uses 1
 # echo Cores: $CORES
 # echo Threads: $THREADS
-echo "System: " $OSTYPE
 grep 'Runtime materialization' $OUT | sed 's/.*Runtime materialization = \(.*\) milliseconds/\1/' | awk '{printf "Time: %.0f ms\n", $1}'
 grep 'Max memory used' $OUT | sed 's/.*: \(.*\) MB/\1/' | awk '{printf "Mem: %.0f MB\n", $1}'
 grep 'Total # derivations:' $OUT | sed 's/.*derivations: */Generated tuples: /'
