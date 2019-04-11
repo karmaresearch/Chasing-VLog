@@ -60,6 +60,15 @@ esac
 
 # VLOG_RULES is not set for the chasebench datasets. We just convert the rules to VLog format.
 case X$VLOG_RULES in
+    X)  ;;
+    *)
+        if [ -f $VLOG_RULES ]
+        then    ::
+        else    VLOG_RULES=
+        fi
+        ;;
+esac
+case X$VLOG_RULES in
 X)
     sh support-scripts/rule-converter $RDFOX_ST_TGDS $RDFOX_T_TGDS > tmpVlogRules
     VLOG_RULES=tmpVlogRules

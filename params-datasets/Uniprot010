@@ -1,4 +1,4 @@
-NAME=Uniprot005_norm.owl
+NAME=Uniprot010_norm.owl
 DIR=datasets/Uniprot/$NAME
 DATA=$DIR/common/data
 VLOG_RULES=$DIR/vlog/$NAME.rules
